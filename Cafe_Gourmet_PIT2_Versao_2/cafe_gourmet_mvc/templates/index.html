@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Café Gourmet</title><link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header><div class="nav">
+  <div class="logo">Café <span>Gourmet</span> ☕</div>
+  <nav>
+    <button class="active" data-v="home">Início</button><button data-v="menu">Cardápio</button>
+    <button data-v="cart">Carrinho (<span id="count">0</span>)</button><button data-v="orders">Acompanhar pedido</button>
+    <button data-v="admin">Administração</button>
+  </nav>
+</div></header>
+<section class="hero" id="hero"><div class="hero-in"><div>
+  <div class="eyebrow">Café feito com carinho</div><h1>Seu momento especial começa aqui.</h1>
+  <p>Cafés selecionados, bebidas especiais e sabores preparados para deixar o seu dia mais gostoso. Escolha seus favoritos e faça seu pedido sem sair de casa.</p>
+  <button class="primary" onclick="view('menu')">Conhecer o cardápio</button>
+</div><div class="cup">☕</div></div></section>
+<main>
+<section class="panel on" id="home"><div class="head"><div><h2>Favoritos da casa</h2><p>Algumas escolhas para começar bem.</p></div><button class="primary" onclick="view('menu')">Ver cardápio completo</button></div><div class="products" id="featured"></div>
+  <div class="features"><div>☕ <b>Grãos selecionados</b><small>Sabor e qualidade em cada xícara.</small></div><div>🥐 <b>Feito na hora</b><small>Produtos preparados com cuidado.</small></div><div>🛍️ <b>Pedido fácil</b><small>Escolha, peça e acompanhe.</small></div></div>
+</section>
+<section class="panel" id="menu"><div class="head"><div><h2>Nosso cardápio</h2><p>Escolha seus produtos favoritos.</p></div><input class="search" id="search" placeholder="Buscar produto..." oninput="renderMenu()"></div><div class="filters" id="filters"></div><div class="products" id="list"></div></section>
+<section class="panel" id="cart"><div class="head"><div><h2>Seu carrinho</h2><p>Confira os itens e os valores antes de confirmar.</p></div></div>
+  <div class="layout"><div class="box"><h3>Itens selecionados</h3><div id="items"></div></div><div class="box summary"><h3>Resumo do pedido</h3><div id="summaryItems" class="summary-items"></div>
+    <div class="line"><span>Subtotal</span><b id="sub">R$ 0,00</b></div><div class="line"><span>Taxa de entrega</span><b id="fee">R$ 0,00</b></div><div class="line grand"><span>Total</span><b id="total">R$ 0,00</b></div>
+    <label class="field">Nome<input id="name" placeholder="Seu nome" autocomplete="name"></label><label class="field">Telefone<input id="phone" placeholder="(00) 00000-0000" autocomplete="tel"></label>
+    <label class="field">Endereço<textarea id="address" rows="2" placeholder="Rua, número e bairro" autocomplete="street-address"></textarea></label><label class="field">Observações<textarea id="note" rows="2" placeholder="Alguma observação?"></textarea></label>
+    <button class="primary full" onclick="checkout()">Confirmar pedido</button><div id="msg" aria-live="polite"></div>
+  </div></div>
+</section>
+<section class="panel" id="orders"><div class="head"><div><h2>Acompanhe seu pedido</h2><p>Informe o número recebido na confirmação e o telefone usado na compra.</p></div></div>
+  <div class="box lookup"><label class="field">Número do pedido<input id="trackId" type="number" min="1" placeholder="Ex.: 12"></label><label class="field">Telefone cadastrado<input id="trackPhone" placeholder="Telefone informado na compra"></label><button class="primary" onclick="trackOrder()">Consultar pedido</button><div id="trackingResult" aria-live="polite"></div></div>
+</section>
+<section class="panel" id="admin"><div class="head"><div><h2>Painel administrativo</h2><p>Área restrita para gerenciar o cardápio e os pedidos.</p></div></div>
+  <div id="loginBox" class="box login-box"><h3>Entrar na administração</h3><p>Use a conta administrativa do projeto para acessar as funções de gerenciamento.</p>
+    <label class="field">Usuário<input id="loginUser" value="admin" autocomplete="username"></label><label class="field">Senha<input id="loginPass" type="password" placeholder="Digite a senha" autocomplete="current-password"></label><button class="primary" onclick="loginAdmin()">Entrar</button><div id="loginMsg" aria-live="polite"></div><small class="hint">Acesso demonstrativo: usuário <b>admin</b> e senha <b>cafe123</b>. Altere as credenciais antes de publicar o sistema.</small>
+  </div>
+  <div id="adminContent" hidden>
+    <div class="admin-top"><span>Você está conectado como administrador.</span><button class="small secondary" onclick="logoutAdmin()">Sair</button></div>
+    <div class="box"><h3>Cadastrar produto</h3><div class="layout form-layout"><div><label class="field">Nome<input id="pname" placeholder="Ex.: Mocha"></label><label class="field">Categoria<select id="pcat"><option>Cafés</option><option>Bebidas</option><option>Lanches</option><option>Sobremesas</option></select></label></div><div><label class="field">Preço (R$)<input id="pprice" type="number" min="0" step=".01"></label><label class="field">Emoji de reserva<input id="pemoji" placeholder="☕"></label></div></div>
+      <label class="field">Descrição<input id="pdesc" placeholder="Descrição do produto"></label><label class="field">Link da imagem (opcional)<input id="pimage" type="url" placeholder="https://...jpg"></label><small class="hint">Use um endereço público de imagem. Se não informar, será exibido o emoji.</small><br><button class="primary" onclick="addProduct()">Adicionar produto</button><div id="adminmsg" aria-live="polite"></div>
+    </div>
+    <div class="box"><h3>Produtos cadastrados</h3><div class="table-wrap"><table class="table"><thead><tr><th>Produto</th><th>Categoria</th><th>Preço</th><th>Disponibilidade</th><th>Ação</th></tr></thead><tbody id="ptable"></tbody></table></div></div>
+    <div class="box"><div class="head compact"><div><h3>Pedidos recebidos</h3><p>Filtre pelo número, nome ou status.</p></div><input class="search" id="orderSearch" placeholder="Buscar pedido..." oninput="renderAdmin()"></div><div id="adminorders"></div></div>
+  </div>
+</section>
+</main><footer>© 2026 Café Gourmet · Projeto acadêmico demonstrativo</footer><script src="/static/app.js"></script>
+</body></html>
